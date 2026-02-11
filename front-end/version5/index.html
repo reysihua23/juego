@@ -1,0 +1,1665 @@
+
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+  <title>Space Invaders MEGA EPIC v5.0 - ULTRA LEGENDARY</title>
+  <style>
+    /*estilo para el btn salir */
+        .contenedor-salir {
+            position: fixed;
+            top: 15px;
+            /* margen desde arriba */
+            left: 15px;
+            /* margen desde la izquierda */
+            z-index: 1000;
+            /* siempre encima del juego */
+        }
+
+        #salir {
+            background: linear-gradient(135deg, #ff4e50, #f9d423);
+            border: none;
+            color: white;
+            padding: 10px 18px;
+            font-size: 15px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        #salir:hover {
+            background: linear-gradient(135deg, #f9d423, #ff4e50);
+            transform: scale(1.08);
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.4);
+        }
+
+        #salir:active {
+            transform: scale(0.95);
+        }
+    :root { 
+      --bg: #0a0a0f; --fg: #f0f8ff; --neon: #00ffff; --gold: #ffaa00; 
+      --red: #ff0066; --green: #00ff88; --purple: #aa00ff; --pink: #ff0088;
+    }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    html, body { height:100vh; overflow:hidden; }
+    body {
+      background: 
+        radial-gradient(circle at 20% 50%, rgba(255,0,102,0.3) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(0,255,255,0.3) 0%, transparent 50%),
+        radial-gradient(circle at 40% 90%, rgba(170,0,255,0.2) 0%, transparent 50%),
+        linear-gradient(135deg, #0a0a0f 0%, #1a0a2e 50%, #16213e 100%);
+      color: var(--fg); font-family: 'Courier New', monospace; font-weight: 900;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      touch-action: none; user-select: none; position: relative;
+      animation: backgroundShift 20s ease-in-out infinite alternate;
+    }
+    
+    @keyframes backgroundShift {
+      0% { filter: hue-rotate(0deg); }
+      100% { filter: hue-rotate(30deg); }
+    }
+    
+    .stars {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background-image: 
+        radial-gradient(2px 2px at 20% 30%, #fff, transparent),
+        radial-gradient(2px 2px at 40% 70%, rgba(255,255,255,0.8), transparent),
+        radial-gradient(1px 1px at 90% 40%, rgba(0,255,255,0.8), transparent),
+        radial-gradient(1px 1px at 60% 10%, rgba(255,170,0,0.8), transparent),
+        radial-gradient(2px 2px at 10% 90%, rgba(170,0,255,0.8), transparent);
+      background-repeat: repeat;
+      background-size: 200px 300px, 400px 400px, 600px 200px, 300px 500px, 500px 250px;
+      animation: twinkle 6s ease-in-out infinite alternate;
+    }
+    
+    @keyframes twinkle {
+      0% { opacity: 0.8; transform: scale(1); }
+      100% { opacity: 1; transform: scale(1.02); }
+    }
+    
+    header { 
+      text-align: center; margin-bottom: 10px; z-index: 10; 
+      background: rgba(0,0,0,0.7); padding: 10px 20px; border-radius: 15px;
+      border: 2px solid var(--neon); box-shadow: 0 0 30px rgba(0,255,255,0.5);
+    }
+    h1 { 
+      font-size: clamp(16px, 5vw, 28px); margin: 5px 0; 
+      background: linear-gradient(45deg, var(--neon), var(--gold), var(--pink), var(--purple));
+      background-size: 400% 400%;
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: gradientShift 3s ease-in-out infinite;
+      text-shadow: 0 0 30px var(--neon);
+    }
+    
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+    
+    .wrap { 
+      position: relative; border-radius: 15px; overflow: hidden;
+      box-shadow: 
+        0 0 50px rgba(0,255,255,0.8),
+        inset 0 0 50px rgba(0,255,255,0.2),
+        0 0 100px rgba(255,0,102,0.3);
+      animation: glowPulse 4s ease-in-out infinite;
+    }
+    
+    @keyframes glowPulse {
+      0%, 100% { box-shadow: 0 0 50px rgba(0,255,255,0.8), inset 0 0 50px rgba(0,255,255,0.2); }
+      50% { box-shadow: 0 0 80px rgba(255,0,102,0.8), inset 0 0 80px rgba(255,0,102,0.2); }
+    }
+    
+    canvas { 
+      background: linear-gradient(180deg, #000011 0%, #001133 30%, #000022 70%, #000000 100%);
+      display: block; border: 3px solid var(--neon);
+    }
+    
+    .hud { 
+      position: absolute; inset: 0; pointer-events: none; 
+      padding: 12px; font-size: 12px; text-shadow: 0 0 10px currentColor;
+    }
+    .hud .top { display: flex; justify-content: space-between; font-weight: 900; }
+    .hud .combo { 
+      position: absolute; top: 35px; left: 50%; transform: translateX(-50%);
+      font-size: 16px; font-weight: 900; text-align: center;
+      animation: comboGlow 1s ease-in-out infinite alternate;
+    }
+    
+    @keyframes comboGlow {
+      0% { text-shadow: 0 0 10px currentColor; }
+      100% { text-shadow: 0 0 20px currentColor, 0 0 30px currentColor; }
+    }
+    
+    .hud .powerups { 
+      position: absolute; top: 55px; right: 12px; 
+      font-size: 11px; text-align: right; line-height: 1.3;
+    }
+    .hud .center { 
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+      text-align: center; font-size: 18px; font-weight: 900;
+      background: rgba(0,0,0,0.8); padding: 20px; border-radius: 10px;
+      border: 2px solid var(--neon);
+    }
+    .hud .achievements {
+      position: absolute; top: 80px; left: 12px;
+      font-size: 10px; line-height: 1.2;
+    }
+    
+    .controls { 
+      display: flex; gap: 8px; margin: 8px 0; flex-wrap: wrap; justify-content: center;
+    }
+    button { 
+      background: linear-gradient(135deg, #1e3a8a, #3b82f6, #06b6d4);
+      color: white; border: none; padding: 8px 16px; border-radius: 8px;
+      font-size: 11px; font-weight: 900; cursor: pointer;
+      transition: all 0.3s ease; 
+      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+      border: 1px solid rgba(0,255,255,0.5);
+    }
+    button:hover { 
+      transform: translateY(-2px) scale(1.05); 
+      box-shadow: 0 8px 25px rgba(0,255,255,0.4);
+      filter: brightness(1.2);
+    }
+    button:active { transform: translateY(0) scale(0.98); }
+    
+    .info { 
+      font-size: 10px; opacity: 0.9; text-align: center; margin-top: 6px; 
+      max-width: 700px; line-height: 1.3;
+    }
+
+    /* Controles táctiles MEGA mejorados */
+    .touch-controls { 
+      position: fixed; bottom: 0; left: 0; right: 0; height: 140px;
+      display: none; pointer-events: none; z-index: 1000;
+    }
+    .dpad { 
+      position: absolute; left: 20px; bottom: 20px; width: 140px; height: 100px;
+      background: rgba(0,0,0,0.8); border: 2px solid var(--neon); border-radius: 12px;
+      pointer-events: auto; display: flex; box-shadow: 0 0 20px rgba(0,255,255,0.5);
+    }
+    .dpad button { 
+      flex: 1; background: rgba(0,255,255,0.2); border: 1px solid var(--neon);
+      color: var(--neon); font-size: 24px; margin: 4px; border-radius: 8px;
+      transition: all 0.2s; font-weight: 900;
+    }
+    .dpad button:active { 
+      background: rgba(0,255,255,0.5); box-shadow: 0 0 20px var(--neon);
+      transform: scale(0.95);
+    }
+    .fire-btn { 
+      position: absolute; right: 20px; bottom: 20px; width: 100px; height: 100px;
+      background: radial-gradient(circle, rgba(255,0,102,0.9), rgba(255,0,102,0.6));
+      border: 3px solid var(--red); border-radius: 50%;
+      color: white; font-size: 16px; font-weight: 900; pointer-events: auto;
+      box-shadow: 0 0 30px rgba(255,0,102,0.7);
+      transition: all 0.2s;
+    }
+    .fire-btn:active {
+      background: radial-gradient(circle, rgba(255,0,102,1), rgba(255,0,102,0.8));
+      transform: scale(0.9); box-shadow: 0 0 50px rgba(255,0,102,1);
+    }
+
+    @media (max-width: 768px), (pointer: coarse) {
+      .touch-controls { display: block; }
+      body { padding-bottom: 140px; }
+    }
+
+    /* Animaciones ÉPICAS */
+    .screen-shake { animation: screenShake 0.4s ease-in-out; }
+    @keyframes screenShake { 
+      0%,100% { transform: translate(0); } 
+      25% { transform: translate(-3px, -3px); } 
+      75% { transform: translate(3px, 3px); } 
+    }
+    
+    .mega-pulse { animation: megaPulse 0.6s ease-in-out; }
+    @keyframes megaPulse { 
+      0% { transform: translate(-50%,-50%) scale(1); } 
+      50% { transform: translate(-50%,-50%) scale(1.2); } 
+      100% { transform: translate(-50%,-50%) scale(1); } 
+    }
+    
+    .rainbow-text { 
+      background: linear-gradient(45deg, #ff0000, #ff8800, #ffff00, #88ff00, #00ffff, #0088ff, #8800ff, #ff0088);
+      background-size: 400% 400%;
+      background-clip: text;
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      animation: rainbow 2s linear infinite;
+    }
+    
+    @keyframes rainbow { 0% { background-position: 0% 50%; } 100% { background-position: 100% 50%; } }
+  </style>
+</head>
+<body>
+    <!--Bnt salir-->
+    <div class="contenedor-salir">
+        <button id="salir" onclick="window.location.href='../index.html'">
+            ⬅️ Regresar al Inicio
+        </button>
+    </div>
+  <div class="stars"></div>
+  
+  <header>
+    <h1>🚀 SPACE INVADERS v5.0 MEGA LEGENDARY 💥</h1>
+    <div class="controls">
+      <button id="start">🎮 NUEVA PARTIDA</button>
+      <button id="pause">⏸️ PAUSA</button>
+      <button id="sound">🔊 SONIDO</button>
+      <button id="fullscreen">📺 PANTALLA COMPLETA</button>
+    </div>
+    <div class="info">
+      🎯 ← → MOVER | ESPACIO DISPARAR | Nivel 5+: MEGA ÉPICO con combos x10, power-ups legendarios, jefes gigantes y efectos increíbles!
+    </div>
+  </header>
+
+  <div class="wrap">
+    <canvas id="canvas" width="900" height="650"></canvas>
+    <div class="hud">
+      <div class="top">
+        <div>💰 SCORE: <span id="score" class="rainbow-text">0</span></div>
+        <div>❤️ <span id="lives">3</span> | 🚀 NIVEL <span id="level">1</span> | ⭐ <span id="multiplier">x1</span></div>
+      </div>
+      <div class="combo" id="combo"></div>
+      <div class="powerups" id="powerups"></div>
+      <div class="achievements" id="achievements"></div>
+      <div class="center" id="message"></div>
+    </div>
+  </div>
+
+  <!-- Controles táctiles MEGA -->
+  <div class="touch-controls">
+    <div class="dpad">
+      <button id="left">◀</button>
+      <button id="right">▶</button>
+    </div>
+    <button class="fire-btn" id="fire">💥<br>FIRE</button>
+  </div>
+
+<script>
+'use strict';
+
+// Configuración MEGA ÉPICA
+const CONFIG = {
+  MEGA_MODE_LEVEL: 5,
+  MAX_PARTICLES: 100,
+  MAX_SHOTS: 50,
+  EPIC_COMBOS: [5, 10, 20, 50, 100],
+  LEGENDARY_POWERUPS: ['speed', 'triple', 'laser', 'shield', 'nuke', 'time', 'mega'],
+  BOSS_LEVELS: [5, 10, 15, 20, 25, 30],
+  ACHIEVEMENTS: {
+    'First Kill': { desc: 'Primera muerte', icon: '🎯' },
+    'Combo Master': { desc: 'Combo x10', icon: '🔥' },
+    'Boss Slayer': { desc: 'Derrota un jefe', icon: '⚔️' },
+    'Legendary': { desc: 'Combo x50', icon: '👑' },
+    'Godlike': { desc: 'Combo x100', icon: '🌟' },
+    'Survivor': { desc: 'Llega al nivel 10', icon: '🛡️' },
+    'Elite': { desc: 'Score 100K', icon: '💎' }
+  }
+};
+
+// Utilidades MEGA optimizadas
+const $ = id => document.getElementById(id);
+const rand = (a, b) => Math.random() * (b - a) + a;
+const randInt = (a, b) => Math.floor(rand(a, b + 1));
+const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
+const dist2 = (x1, y1, x2, y2) => (x2-x1)**2 + (y2-y1)**2;
+const lerp = (a, b, t) => a + (b - a) * t;
+
+// Pool de objetos MEGA optimizado
+class MegaPool {
+  constructor(createFn, resetFn, size = 100) {
+    this.createFn = createFn;
+    this.resetFn = resetFn;
+    this.pool = [];
+    this.active = [];
+    for(let i = 0; i < size; i++) this.pool.push(createFn());
+  }
+  
+  get(...args) {
+    const obj = this.pool.pop() || this.createFn();
+    this.resetFn(obj, args);
+    this.active.push(obj);
+    return obj;
+  }
+  
+  release(obj) {
+    const idx = this.active.indexOf(obj);
+    if(idx >= 0) {
+      this.active.splice(idx, 1);
+      if(this.pool.length < 200) this.pool.push(obj);
+    }
+  }
+  
+  update(dt) {
+    for(let i = this.active.length - 1; i >= 0; i--) {
+      const obj = this.active[i];
+      obj.update(dt);
+      if(!obj.active) this.release(obj);
+    }
+  }
+  
+  draw(ctx) {
+    for(const obj of this.active) obj.draw(ctx);
+  }
+  
+  clear() {
+    this.pool.push(...this.active);
+    this.active = [];
+  }
+}
+
+// Canvas setup MEGA mejorado
+function setupCanvas(canvas) {
+  const dpr = window.devicePixelRatio || 1;
+  const maxW = Math.min(900, window.innerWidth - 40);
+  const maxH = Math.min(650, window.innerHeight - 250);
+  const w = Math.max(600, maxW);
+  const h = Math.max(400, maxH);
+  
+  canvas.style.width = w + 'px';
+  canvas.style.height = h + 'px';
+  canvas.width = w * dpr;
+  canvas.height = h * dpr;
+  
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.imageSmoothingEnabled = false;
+  
+  return { ctx, w, h };
+}
+
+// Sistema de audio MEGA ÉPICO
+const MegaAudio = (() => {
+  const AC = window.AudioContext || window.webkitAudioContext;
+  let ctx, muted = false;
+  
+  const init = () => ctx = ctx || new AC();
+  
+  const createTone = (freq, time, type = 'square', vol = 0.1) => {
+    if(muted) return;
+    init();
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    const f = ctx.createBiquadFilter();
+    
+    o.frequency.value = freq; o.type = type;
+    f.frequency.value = freq * 2; f.type = 'lowpass';
+    g.gain.setValueAtTime(vol, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + time);
+    
+    o.connect(f).connect(g).connect(ctx.destination);
+    o.start(); o.stop(ctx.currentTime + time);
+  };
+  
+  const megaTone = (freqs, type = 'square', time = 0.1, vol = 0.1) => {
+    freqs.forEach((f, i) => setTimeout(() => createTone(f, time, type, vol), i * 30));
+  };
+  
+  return {
+    shoot: () => createTone(800, 0.05),
+    megaShoot: () => megaTone([600, 800, 1000, 1200], 'square', 0.06),
+    laserShoot: () => megaTone([1000, 1100, 1200, 1300, 1400], 'sine', 0.08, 0.08),
+    hit: () => createTone(200, 0.08, 'sawtooth'),
+    explode: () => megaTone([150, 100, 70, 50], 'sawtooth', 0.15, 0.12),
+    megaExplode: () => megaTone([200, 150, 100, 70, 50, 30], 'sawtooth', 0.2, 0.15),
+    powerup: () => megaTone([440, 554, 659, 880], 'triangle', 0.12, 0.08),
+    megaPowerup: () => megaTone([440, 554, 659, 880, 1108, 1319], 'sine', 0.15, 0.1),
+    combo: (level) => {
+      const baseFreq = 440 + level * 110;
+      megaTone(Array.from({length: level + 3}, (_, i) => baseFreq + i * 200), 'sine', 0.1, 0.08);
+    },
+    boss: () => megaTone([60, 80, 100, 120, 80, 60], 'sawtooth', 0.4, 0.2),
+    step: () => createTone(300 + Math.random() * 200, 0.02, 'triangle', 0.04),
+    nuke: () => megaTone([50, 60, 80, 100, 150, 200, 300, 400, 500], 'sawtooth', 0.3, 0.2),
+    toggle: () => { muted = !muted; return !muted; }
+  };
+})();
+
+// Entidades MEGA ÉPICAS
+class MegaPlayer {
+  constructor(x, y) {
+    this.x = x; this.y = y; this.vx = 0;
+    this.lastShot = 0; this.shootDelay = 100;
+    this.health = 100; this.maxHealth = 100;
+    this.shield = 0; this.anim = 0;
+  }
+  
+  update(dt, w) {
+    this.anim += dt * 6;
+    this.x = clamp(this.x + this.vx * dt, 20, w - 20);
+    if(this.shield > 0) this.shield -= dt;
+  }
+  
+  canShoot() { return performance.now() - this.lastShot > this.shootDelay; }
+  
+  draw(ctx) {
+    const { x, y, shield, anim } = this;
+    
+    // Escudo visual
+    if(shield > 0) {
+      ctx.strokeStyle = `rgba(0, 255, 255, ${shield / 10})`;
+      ctx.lineWidth = 3;
+      const shieldRadius = 25 + Math.sin(anim) * 3;
+      ctx.beginPath();
+      ctx.arc(x, y, shieldRadius, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+    
+    // Nave principal con efectos
+    const pulse = 1 + Math.sin(anim) * 0.1;
+    ctx.fillStyle = Game.level >= CONFIG.MEGA_MODE_LEVEL ? '#00ffff' : '#ffffff';
+    
+    // Cuerpo principal
+    ctx.fillRect(x - 12 * pulse, y - 6, 24 * pulse, 12);
+    ctx.fillRect(x - 6, y - 15, 12, 9);
+    
+    // Propulsores con efectos
+    ctx.fillStyle = '#ff0066';
+    ctx.fillRect(x - 8, y + 3, 3, 5 + Math.sin(anim * 2) * 2);
+    ctx.fillRect(x + 5, y + 3, 3, 5 + Math.sin(anim * 2) * 2);
+    
+    // Cañón mejorado
+    ctx.fillStyle = Game.level >= CONFIG.MEGA_MODE_LEVEL ? '#ffaa00' : '#00ffff';
+    ctx.fillRect(x - 2, y - 18, 4, 8);
+    
+    // Efectos de nivel épico
+    if(Game.level >= CONFIG.MEGA_MODE_LEVEL) {
+      ctx.strokeStyle = '#ffaa00';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(x - 14, y - 8, 28, 16);
+      
+      // Partículas de energía
+      for(let i = 0; i < 3; i++) {
+        const px = x + (Math.sin(anim + i * 2) * 20);
+        const py = y + 10 + (Math.cos(anim + i) * 5);
+        ctx.fillStyle = `rgba(255, 170, 0, ${0.5 + Math.sin(anim + i) * 0.3})`;
+        ctx.fillRect(px, py, 2, 2);
+      }
+    }
+  }
+}
+
+class MegaEnemy {
+  constructor() {
+    this.reset(0, 0, 0);
+  }
+  
+  reset(x, y, type) {
+    this.x = x; this.y = y; this.type = type;
+    this.active = true; this.anim = Math.random() * 6.28;
+    this.hp = Game.level >= CONFIG.MEGA_MODE_LEVEL ? 2 + type : 1;
+    this.maxHp = this.hp;
+    this.shootCooldown = 0;
+  }
+  
+  update(dt) {
+    this.anim += dt * (4 + this.type);
+    if(this.shootCooldown > 0) this.shootCooldown -= dt;
+  }
+  
+  draw(ctx) {
+    if(!this.active) return;
+    const { x, y, type, anim, hp, maxHp } = this;
+    
+    const colors = ['#33ff88', '#ffaa00', '#ff3366', '#aa88ff', '#00ffff', '#ff0088'];
+    const size = 10 + type * 3;
+    
+    // Efecto de daño
+    const damageEffect = 1 - (hp / maxHp) * 0.3;
+    const pulse = 1 + Math.sin(anim) * (0.1 + damageEffect);
+    
+    ctx.fillStyle = colors[type % colors.length];
+    ctx.fillRect(x - size * pulse, y - size * pulse, size * 2 * pulse, size * 2 * pulse);
+    
+    // Efectos especiales para nivel épico
+    if(Game.level >= CONFIG.MEGA_MODE_LEVEL) {
+      ctx.strokeStyle = colors[(type + 1) % colors.length];
+      ctx.lineWidth = 1;
+      ctx.strokeRect(x - size * pulse, y - size * pulse, size * 2 * pulse, size * 2 * pulse);
+      
+      // Ojos brillantes
+      ctx.fillStyle = '#ffffff';
+      const eyeGlow = Math.sin(anim * 2) * 2;
+      ctx.fillRect(x - 4 + eyeGlow, y - 3, 3, 3);
+      ctx.fillRect(x + 1 - eyeGlow, y - 3, 3, 3);
+    } else {
+      // Ojos normales
+      ctx.fillStyle = '#000';
+      const eyeOff = Math.sin(anim) * 1;
+      ctx.fillRect(x - 3 + eyeOff, y - 2, 2, 2);
+      ctx.fillRect(x + 1 - eyeOff, y - 2, 2, 2);
+    }
+    
+    // Barra de vida para enemigos con múltiple HP
+    if(maxHp > 1) {
+      const barW = size * 2, barH = 2;
+      ctx.fillStyle = '#333';
+      ctx.fillRect(x - barW/2, y - size - 8, barW, barH);
+      ctx.fillStyle = hp > maxHp * 0.5 ? '#33ff88' : '#ff3366';
+      ctx.fillRect(x - barW/2, y - size - 8, (hp / maxHp) * barW, barH);
+    }
+  }
+}
+
+class MegaBoss {
+  constructor() {
+    this.reset();
+  }
+  
+  reset() {
+    this.x = 450; this.y = 100; this.vx = 80 + Game.level * 10;
+    this.hp = this.maxHp = 80 + Game.level * 20;
+    this.active = true; this.anim = 0;
+    this.shootTimer = 0; this.phase = 1;
+    this.specialTimer = 0;
+  }
+  
+  update(dt, w) {
+    this.anim += dt * 3;
+    this.x += this.vx * dt;
+    if(this.x < 80 || this.x > w - 80) this.vx *= -1;
+    
+    this.shootTimer += dt;
+    this.specialTimer += dt;
+    
+    // Cambio de fase según HP
+    this.phase = Math.ceil((this.hp / this.maxHp) * 3);
+  }
+  
+  draw(ctx) {
+    if(!this.active) return;
+    const { x, y, hp, maxHp, anim, phase } = this;
+    
+    // Tamaño y efectos según fase
+    const baseSize = 40 + (4 - phase) * 10;
+    const pulse = 1 + Math.sin(anim) * (0.2 + (4 - phase) * 0.1);
+    
+    // Colores según fase
+    const phaseColors = {
+      3: '#ff3366',
+      2: '#ff8800', 
+      1: '#8800ff'
+    };
+    
+    // Cuerpo principal
+    ctx.fillStyle = phaseColors[phase] || '#ff0000';
+    ctx.fillRect(x - baseSize * pulse, y - 20 * pulse, baseSize * 2 * pulse, 40 * pulse);
+    
+    // Alas
+    ctx.fillStyle = '#aa00ff';
+    ctx.fillRect(x - baseSize * 1.5, y - 10, 15, 20);
+    ctx.fillRect(x + baseSize * 1.5 - 15, y - 10, 15, 20);
+    
+    // Núcleo central
+    ctx.fillStyle = '#ffaa00';
+    const coreSize = 12 * pulse;
+    ctx.fillRect(x - coreSize, y - coreSize, coreSize * 2, coreSize * 2);
+    
+    // Ojos intimidantes
+    ctx.fillStyle = '#ffffff';
+    const eyeIntensity = Math.sin(anim * 4);
+    ctx.fillRect(x - 15 + eyeIntensity * 2, y - 8, 6, 6);
+    ctx.fillRect(x + 9 - eyeIntensity * 2, y - 8, 6, 6);
+    
+    // Efectos especiales por fase
+    if(phase <= 2) {
+      // Aura de energía
+      ctx.strokeStyle = `rgba(255, 170, 0, ${0.5 + Math.sin(anim * 2) * 0.3})`;
+      ctx.lineWidth = 4;
+      ctx.strokeRect(x - baseSize * pulse, y - 20 * pulse, baseSize * 2 * pulse, 40 * pulse);
+    }
+    
+    if(phase === 1) {
+      // Modo berserk con partículas
+      for(let i = 0; i < 5; i++) {
+        const px = x + Math.sin(anim + i) * 60;
+        const py = y + Math.cos(anim + i * 0.7) * 30;
+        ctx.fillStyle = `rgba(136, 0, 255, ${0.6 + Math.sin(anim + i) * 0.4})`;
+        ctx.fillRect(px, py, 3, 3);
+      }
+    }
+    
+    // Barra de vida épica
+    const barW = 120, barH = 8, barY = y - 40;
+    
+    // Fondo de la barra
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(x - barW/2 - 2, barY - 2, barW + 4, barH + 4);
+    
+    // Barra de vida con gradiente
+    const healthPercent = hp / maxHp;
+    const gradient = ctx.createLinearGradient(x - barW/2, barY, x + barW/2, barY);
+    if(healthPercent > 0.6) {
+      gradient.addColorStop(0, '#33ff88');
+      gradient.addColorStop(1, '#00ff88');
+    } else if(healthPercent > 0.3) {
+      gradient.addColorStop(0, '#ffaa00');
+      gradient.addColorStop(1, '#ff8800');
+    } else {
+      gradient.addColorStop(0, '#ff3366');
+      gradient.addColorStop(1, '#ff0033');
+    }
+    
+    ctx.fillStyle = gradient;
+    ctx.fillRect(x - barW/2, barY, healthPercent * barW, barH);
+    
+    // Borde de la barra
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(x - barW/2, barY, barW, barH);
+    
+    // Texto de HP
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 10px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(`${hp}/${maxHp}`, x, barY + barH + 12);
+  }
+}
+
+class MegaShot {
+  constructor() {
+    this.reset(0, 0, 0, 'player', 'normal');
+  }
+  
+  reset(x, y, vy, owner, type = 'normal') {
+    this.x = x; this.y = y; this.vy = vy; this.owner = owner; this.type = type;
+    this.active = true; this.anim = 0; this.damage = 1;
+    
+    if(type === 'laser') this.damage = 3;
+    if(type === 'mega') this.damage = 5;
+  }
+  
+  update(dt) {
+    this.anim += dt * 10;
+    this.y += this.vy * dt;
+    if(this.y < -20 || this.y > 670) this.active = false;
+  }
+  
+  draw(ctx) {
+    if(!this.active) return;
+    const { x, y, owner, type, anim } = this;
+    
+    if(owner === 'player') {
+      if(type === 'laser') {
+        // Láser épico
+        const gradient = ctx.createLinearGradient(x, y - 20, x, y + 20);
+        gradient.addColorStop(0, 'rgba(0, 255, 255, 0)');
+        gradient.addColorStop(0.5, '#00ffff');
+        gradient.addColorStop(1, 'rgba(0, 255, 255, 0)');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(x - 3, y - 20, 6, 40);
+        
+        // Núcleo brillante
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(x - 1, y - 15, 2, 30);
+      } else if(type === 'mega') {
+        // Disparo mega con efectos
+        const size = 4 + Math.sin(anim) * 2;
+        const gradient = ctx.createRadialGradient(x, y, 0, x, y, size);
+        gradient.addColorStop(0, '#ffffff');
+        gradient.addColorStop(0.5, '#ffaa00');
+        gradient.addColorStop(1, 'rgba(255, 170, 0, 0)');
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        ctx.arc(x, y, size, 0, Math.PI * 2);
+        ctx.fill();
+      } else {
+        // Disparo normal mejorado
+        const intensity = Game.level >= CONFIG.MEGA_MODE_LEVEL ? 1 + Math.sin(anim) * 0.5 : 1;
+        ctx.fillStyle = `rgba(0, 255, 255, ${intensity})`;
+        ctx.fillRect(x - 2, y - 8, 4, 16);
+        
+        if(Game.level >= CONFIG.MEGA_MODE_LEVEL) {
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(x - 1, y - 6, 2, 12);
+        }
+      }
+    } else {
+      // Disparos enemigos
+      ctx.fillStyle = Game.level >= CONFIG.MEGA_MODE_LEVEL ? '#ff0066' : '#ff3366';
+      ctx.fillRect(x - 2, y - 6, 4, 12);
+      
+      if(Game.level >= CONFIG.MEGA_MODE_LEVEL) {
+        ctx.fillStyle = `rgba(255, 0, 102, ${0.5 + Math.sin(anim) * 0.5})`;
+        ctx.fillRect(x - 3, y - 8, 6, 16);
+      }
+    }
+  }
+}
+
+class MegaParticle {
+  constructor() {
+    this.reset(0, 0, '#fff');
+  }
+  
+  reset(x, y, color, type = 'explosion') {
+    this.x = x; this.y = y; this.color = color; this.type = type;
+    this.vx = rand(-150, 150); this.vy = rand(-200, -30);
+    this.life = this.maxLife = rand(0.4, 1.2);
+    this.size = rand(1, type === 'mega' ? 6 : 3);
+    this.active = true; this.rotation = rand(0, Math.PI * 2);
+    this.rotSpeed = rand(-5, 5);
+  }
+  
+  update(dt) {
+    this.life -= dt;
+    this.x += this.vx * dt; this.y += this.vy * dt;
+    this.vy += 400 * dt; // Gravedad
+    this.rotation += this.rotSpeed * dt;
+    this.size *= 0.98; // Encogimiento
+    if(this.life <= 0 || this.size < 0.5) this.active = false;
+  }
+  
+  draw(ctx) {
+    if(!this.active) return;
+    const alpha = this.life / this.maxLife;
+    
+    ctx.save();
+    ctx.translate(this.x, this.y);
+    ctx.rotate(this.rotation);
+    ctx.globalAlpha = alpha;
+    
+    if(this.type === 'mega') {
+      // Partículas mega con gradiente
+      const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, this.size);
+      gradient.addColorStop(0, this.color);
+      gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.arc(0, 0, this.size, 0, Math.PI * 2);
+      ctx.fill();
+    } else {
+      ctx.fillStyle = this.color;
+      ctx.fillRect(-this.size/2, -this.size/2, this.size, this.size);
+    }
+    
+    ctx.restore();
+  }
+}
+
+class MegaPowerUp {
+  constructor() {
+    this.reset(0, 0, 'speed');
+  }
+  
+  reset(x, y, type) {
+    this.x = x; this.y = y; this.type = type; this.vy = 80;
+    this.active = true; this.anim = 0; this.collected = false;
+    this.rarity = this.getRarity(type);
+  }
+  
+  getRarity(type) {
+    const rarities = {
+      'speed': 'common',
+      'triple': 'common', 
+      'shield': 'uncommon',
+      'laser': 'rare',
+      'nuke': 'epic',
+      'time': 'legendary',
+      'mega': 'mythic'
+    };
+    return rarities[type] || 'common';
+  }
+  
+  update(dt) {
+    this.y += this.vy * dt; this.anim += dt * 4;
+    if(this.y > 670) this.active = false;
+  }
+  
+  draw(ctx) {
+    if(!this.active) return;
+    const { x, y, type, anim, rarity } = this;
+    
+    const rarityColors = {
+      'common': '#ffffff',
+      'uncommon': '#00ff88', 
+      'rare': '#0088ff',
+      'epic': '#8800ff',
+      'legendary': '#ffaa00',
+      'mythic': '#ff0088'
+    };
+    
+    const size = 12 + Math.sin(anim) * 4;
+    const color = rarityColors[rarity];
+    
+    // Aura según rareza
+    if(rarity !== 'common') {
+      ctx.shadowBlur = 20;
+      ctx.shadowColor = color;
+      
+      // Partículas orbitales para rareza épica+
+      if(['epic', 'legendary', 'mythic'].includes(rarity)) {
+        for(let i = 0; i < 3; i++) {
+          const angle = anim + i * (Math.PI * 2 / 3);
+          const px = x + Math.cos(angle) * 25;
+          const py = y + Math.sin(angle) * 15;
+          ctx.fillStyle = `rgba(${color.slice(1, 3)}, ${color.slice(3, 5)}, ${color.slice(5, 7)}, 0.7)`;
+          ctx.fillRect(px, py, 2, 2);
+        }
+      }
+    }
+    
+    // Cuerpo principal
+    ctx.fillStyle = color;
+    ctx.fillRect(x - size, y - size, size * 2, size * 2);
+    
+    // Icono
+    ctx.fillStyle = '#000000';
+    ctx.font = 'bold 14px monospace';
+    ctx.textAlign = 'center';
+    const icons = {
+      'speed': 'S', 'triple': 'T', 'shield': 'H', 'laser': 'L',
+      'nuke': 'N', 'time': '⏱', 'mega': '★'
+    };
+    ctx.fillText(icons[type] || '?', x, y + 5);
+    
+    ctx.shadowBlur = 0;
+  }
+}
+
+// SISTEMA DE LOGROS
+class AchievementSystem {
+  constructor() {
+    this.unlocked = new Set();
+    this.notifications = [];
+  }
+  
+  check(type, value) {
+    let newAchievements = [];
+    
+    switch(type) {
+      case 'kill':
+        if(value === 1 && !this.unlocked.has('First Kill')) {
+          newAchievements.push('First Kill');
+        }
+        break;
+      case 'combo':
+        if(value >= 10 && !this.unlocked.has('Combo Master')) {
+          newAchievements.push('Combo Master');
+        }
+        if(value >= 50 && !this.unlocked.has('Legendary')) {
+          newAchievements.push('Legendary');
+        }
+        if(value >= 100 && !this.unlocked.has('Godlike')) {
+          newAchievements.push('Godlike');
+        }
+        break;
+      case 'boss':
+        if(!this.unlocked.has('Boss Slayer')) {
+          newAchievements.push('Boss Slayer');
+        }
+        break;
+      case 'level':
+        if(value >= 10 && !this.unlocked.has('Survivor')) {
+          newAchievements.push('Survivor');
+        }
+        break;
+      case 'score':
+        if(value >= 100000 && !this.unlocked.has('Elite')) {
+          newAchievements.push('Elite');
+        }
+        break;
+    }
+    
+    newAchievements.forEach(name => {
+      this.unlocked.add(name);
+      this.notifications.push({
+        name, 
+        time: performance.now(),
+        duration: 4000
+      });
+      MegaAudio.megaPowerup();
+    });
+  }
+  
+  update() {
+    this.notifications = this.notifications.filter(n => 
+      performance.now() - n.time < n.duration
+    );
+  }
+  
+  draw(ctx) {
+    this.notifications.forEach((notif, i) => {
+      const elapsed = performance.now() - notif.time;
+      const alpha = elapsed < 500 ? elapsed / 500 : 
+                   elapsed > 3500 ? 1 - (elapsed - 3500) / 500 : 1;
+      
+      const achievement = CONFIG.ACHIEVEMENTS[notif.name];
+      if(!achievement) return;
+      
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      
+      const y = 100 + i * 50;
+      const x = 50;
+      
+      // Fondo
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+      ctx.fillRect(x - 5, y - 15, 200, 30);
+      ctx.strokeStyle = '#ffaa00';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(x - 5, y - 15, 200, 30);
+      
+      // Texto
+      ctx.fillStyle = '#ffaa00';
+      ctx.font = 'bold 12px monospace';
+      ctx.textAlign = 'left';
+      ctx.fillText(`${achievement.icon} ${notif.name}`, x, y - 2);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '10px monospace';
+      ctx.fillText(achievement.desc, x, y + 10);
+      
+      ctx.restore();
+    });
+  }
+}
+
+// JUEGO PRINCIPAL MEGA ÉPICO
+const Game = {
+  init() {
+    this.canvas = $('canvas');
+    this.setupCanvas();
+    this.setupPools();
+    this.achievements = new AchievementSystem();
+    this.reset();
+    this.bindEvents();
+    this.loop();
+    
+    window.addEventListener('resize', () => this.setupCanvas());
+  },
+  
+  setupCanvas() {
+    const setup = setupCanvas(this.canvas);
+    this.ctx = setup.ctx; this.w = setup.w; this.h = setup.h;
+  },
+  
+  setupPools() {
+    this.shotPool = new MegaPool(() => new MegaShot(), (obj, args) => obj.reset(...args));
+    this.particlePool = new MegaPool(() => new MegaParticle(), (obj, args) => obj.reset(...args));
+    this.enemyPool = new MegaPool(() => new MegaEnemy(), (obj, args) => obj.reset(...args));
+    this.powerupPool = new MegaPool(() => new MegaPowerUp(), (obj, args) => obj.reset(...args));
+  },
+  
+  reset() {
+    this.state = 'menu';
+    this.level = 1; this.score = 0; this.lives = 3;
+    this.combo = 0; this.maxCombo = 0; this.scoreMultiplier = 1;
+    
+    // Power-ups MEGA
+    this.powerups = {
+      speed: 0, triple: 0, laser: 0, shield: 0,
+      nuke: 0, time: 0, mega: 0
+    };
+    
+    this.player = new MegaPlayer(this.w / 2, this.h - 50);
+    this.boss = new MegaBoss();
+    
+    // Limpiar pools
+    this.shotPool.clear();
+    this.particlePool.clear();
+    this.enemyPool.clear();
+    this.powerupPool.clear();
+    
+    this.spawnWave();
+    this.updateUI();
+    this.showMessage('🚀 ¡NUEVA PARTIDA PARA LA EXPERIENCIA MEGA ÉPICA!');
+  },
+  
+  spawnWave() {
+    const isBossLevel = CONFIG.BOSS_LEVELS.includes(this.level);
+    
+    if(isBossLevel) {
+      this.boss.reset();
+      this.isBossLevel = true;
+      MegaAudio.boss();
+      return;
+    }
+    
+    this.isBossLevel = false;
+    const rows = Math.min(6, 3 + Math.floor(this.level / 3));
+    const cols = Math.min(14, 8 + Math.floor(this.level / 2));
+    
+    for(let r = 0; r < rows; r++) {
+      for(let c = 0; c < cols; c++) {
+        const x = 70 + c * (this.w - 140) / (cols - 1);
+        const y = 80 + r * 40;
+        this.enemyPool.get(x, y, r);
+      }
+    }
+    
+    this.enemyDir = 1;
+    this.enemySpeed = 40 + this.level * 8;
+    this.stepTimer = 0;
+    this.shootTimer = 0;
+  },
+  
+  bindEvents() {
+    this.keys = {};
+    
+    const keydown = e => {
+      if(['ArrowLeft', 'ArrowRight', 'Space', 'KeyP', 'KeyR'].includes(e.code)) {
+        e.preventDefault();
+      }
+      this.keys[e.code] = true;
+      
+      if(e.code === 'Space' && this.state === 'menu') this.start();
+      if(e.code === 'KeyP') this.togglePause();
+      if(e.code === 'KeyR') this.reset();
+    };
+    
+    document.addEventListener('keydown', keydown);
+    document.addEventListener('keyup', e => this.keys[e.code] = false);
+    
+    // Botones UI
+    $('start').onclick = () => this.start();
+    $('pause').onclick = () => this.togglePause();
+    $('sound').onclick = () => {
+      const on = MegaAudio.toggle();
+      $('sound').textContent = on ? '🔊 SONIDO' : '🔇 MUDO';
+    };
+    $('fullscreen').onclick = () => {
+      if(!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+      } else {
+        document.exitFullscreen();
+      }
+    };
+    
+    // Controles táctiles
+    const touch = (id, key, action = 'toggle') => {
+      const el = $(id);
+      el.addEventListener('touchstart', e => {
+        e.preventDefault();
+        if(action === 'shoot') this.shoot();
+        else this.keys[key] = true;
+      });
+      el.addEventListener('touchend', e => {
+        e.preventDefault();
+        if(action !== 'shoot') this.keys[key] = false;
+      });
+    };
+    
+    touch('left', 'ArrowLeft');
+    touch('right', 'ArrowRight');
+    touch('fire', 'Space', 'shoot');
+    
+    document.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
+  },
+  
+  start() {
+    if(this.state === 'menu' || this.state === 'gameover') {
+      this.reset();
+    }
+    this.state = 'playing';
+    this.showMessage('');
+  },
+  
+  togglePause() {
+    if(this.state === 'playing') {
+      this.state = 'paused';
+      this.showMessage('⏸️ PAUSA - P PARA CONTINUAR');
+    } else if(this.state === 'paused') {
+      this.state = 'playing';
+      this.showMessage('');
+    }
+  },
+  
+  shoot() {
+    let delay = 100;
+    if(this.powerups.speed > 0) delay = 40;
+    if(this.level >= CONFIG.MEGA_MODE_LEVEL) delay *= 0.7;
+    
+    if(!this.player.canShoot()) return;
+    
+    this.player.lastShot = performance.now();
+    
+    // Tipos de disparo según power-ups
+    if(this.powerups.mega > 0) {
+      MegaAudio.megaShoot();
+      this.shotPool.get(this.player.x, this.player.y - 15, -600, 'player', 'mega');
+    } else if(this.powerups.laser > 0) {
+      MegaAudio.laserShoot();
+      this.shotPool.get(this.player.x, this.player.y - 15, -550, 'player', 'laser');
+    } else if(this.powerups.triple > 0) {
+      MegaAudio.megaShoot();
+      for(let i = -1; i <= 1; i++) {
+        this.shotPool.get(this.player.x + i * 15, this.player.y - 15, -500, 'player');
+      }
+    } else {
+      MegaAudio.shoot();
+      this.shotPool.get(this.player.x, this.player.y - 15, -500, 'player');
+    }
+  },
+  
+  spawnParticles(x, y, color, count = 15, type = 'explosion') {
+    for(let i = 0; i < count; i++) {
+      this.particlePool.get(x + rand(-10, 10), y + rand(-10, 10), color, type);
+    }
+  },
+  
+  hitPlayer() {
+    if(this.player.shield > 0) {
+      this.player.shield = 0;
+      MegaAudio.hit();
+      this.spawnParticles(this.player.x, this.player.y, '#00ffff', 10);
+      return;
+    }
+    
+    this.lives--;
+    this.combo = 0;
+    this.scoreMultiplier = 1;
+    MegaAudio.explode();
+    this.spawnParticles(this.player.x, this.player.y, '#ff3366', 25);
+    
+    // Screen shake
+    document.body.classList.add('screen-shake');
+    setTimeout(() => document.body.classList.remove('screen-shake'), 400);
+    
+    if(this.lives <= 0) {
+      this.state = 'gameover';
+      this.showMessage(`💀 GAME OVER<br>SCORE FINAL: ${this.score.toLocaleString()}<br>MAX COMBO: ${this.maxCombo}<br>R PARA REINICIAR`);
+    } else {
+      setTimeout(() => {
+        this.player.x = this.w / 2;
+        this.player.shield = 3; // Invulnerabilidad temporal
+        this.shotPool.active = this.shotPool.active.filter(s => s.owner !== 'enemy');
+      }, 200);
+    }
+    
+    this.updateUI();
+  },
+  
+  nextLevel() {
+    this.level++;
+    MegaAudio.megaPowerup();
+    this.spawnWave();
+    
+    // Bonus por completar nivel
+    const levelBonus = this.level * 100 * this.scoreMultiplier;
+    this.score += levelBonus;
+    
+    this.achievements.check('level', this.level);
+    
+    let message = `🎯 NIVEL ${this.level}!`;
+    if(this.level === CONFIG.MEGA_MODE_LEVEL) {
+      message += '<br>🔥 ¡MODO MEGA ÉPICO ACTIVADO! 🔥';
+    }
+    if(CONFIG.BOSS_LEVELS.includes(this.level)) {
+      message += '<br>👹 ¡JEFE APARECIÓ!';
+    }
+    
+    this.showMessage(message);
+    setTimeout(() => this.showMessage(''), 1500);
+    this.updateUI();
+  },
+  
+  update(dt) {
+    if(this.state !== 'playing') return;
+    
+    // Actualizar power-ups
+    Object.keys(this.powerups).forEach(key => {
+      if(this.powerups[key] > 0) this.powerups[key] -= dt;
+    });
+    
+    // Input del jugador
+    this.player.vx = 0;
+    if(this.keys['ArrowLeft']) this.player.vx = -400;
+    if(this.keys['ArrowRight']) this.player.vx = 400;
+    if(this.keys['Space']) this.shoot();
+    
+    // Actualizar entidades
+    this.player.update(dt, this.w);
+    this.shotPool.update(dt);
+    this.particlePool.update(dt);
+    this.powerupPool.update(dt);
+    this.achievements.update();
+    
+    // Lógica del jefe
+    if(this.isBossLevel && this.boss.active) {
+      this.boss.update(dt, this.w);
+      
+      // Disparos del jefe
+      this.boss.shootTimer += dt;
+      const shootDelay = 0.6 - this.boss.phase * 0.1;
+      
+      if(this.boss.shootTimer > shootDelay) {
+        this.boss.shootTimer = 0;
+        MegaAudio.step();
+        
+        // Patrones de disparo según fase
+        if(this.boss.phase === 3) {
+          // Fase 1: disparo triple
+          for(let i = -1; i <= 1; i++) {
+            this.shotPool.get(this.boss.x + i * 20, this.boss.y + 25, 200, 'enemy');
+          }
+        } else if(this.boss.phase === 2) {
+          // Fase 2: disparo en abanico
+          for(let i = -2; i <= 2; i++) {
+            this.shotPool.get(this.boss.x + i * 15, this.boss.y + 25, 220 + i * 20, 'enemy');
+          }
+        } else {
+          // Fase 3: lluvia de balas
+          for(let i = -3; i <= 3; i++) {
+            this.shotPool.get(this.boss.x + i * 12, this.boss.y + 25, 250 + Math.random() * 50, 'enemy');
+          }
+        }
+      }
+      
+      // Ataques especiales
+      this.boss.specialTimer += dt;
+      if(this.boss.specialTimer > 3 && this.boss.phase <= 2) {
+        this.boss.specialTimer = 0;
+        // Ataque especial: explosión de partículas
+        this.spawnParticles(this.boss.x, this.boss.y, '#ff8800', 20, 'mega');
+      }
+      
+    } else {
+      // Lógica de enemigos normales
+      this.enemyPool.update(dt);
+      this.stepTimer += dt;
+      
+      const stepDelay = Math.max(0.15, 1.0 - this.level * 0.04 - this.enemyPool.active.length * 0.01);
+      
+      if(this.stepTimer > stepDelay) {
+        this.stepTimer = 0;
+        MegaAudio.step();
+        
+        let hitEdge = false;
+        for(const enemy of this.enemyPool.active) {
+          enemy.x += this.enemyDir * (15 + this.level * 2);
+          if(enemy.x < 50 || enemy.x > this.w - 50) hitEdge = true;
+        }
+        
+        if(hitEdge) {
+          this.enemyDir *= -1;
+          for(const enemy of this.enemyPool.active) {
+            enemy.y += 20 + this.level * 2;
+          }
+        }
+      }
+      
+      // Disparos de enemigos
+      this.shootTimer += dt;
+      const enemyShootDelay = Math.max(0.3, 1.2 - this.level * 0.08);
+      
+      if(this.shootTimer > enemyShootDelay) {
+        this.shootTimer = 0;
+        const activeEnemies = this.enemyPool.active.filter(e => e.active && e.shootCooldown <= 0);
+        
+        if(activeEnemies.length > 0) {
+          const shootCount = this.level >= CONFIG.MEGA_MODE_LEVEL ? 
+            Math.min(3, Math.floor(activeEnemies.length / 5) + 1) : 1;
+          
+        }
+      }
+    }
+    
+    // COLISIONES - Disparos del jugador vs enemigos
+    for(const shot of this.shotPool.active) {
+      if(!shot.active || shot.owner !== 'player') continue;
+      
+      // vs Jefe
+      if(this.isBossLevel && this.boss.active) {
+        if(dist2(shot.x, shot.y, this.boss.x, this.boss.y) < 2500) {
+          shot.active = false;
+          this.boss.hp -= shot.damage;
+          MegaAudio.hit();
+          this.spawnParticles(shot.x, shot.y, '#ffaa00', 8);
+          
+          if(this.boss.hp <= 0) {
+            this.boss.active = false;
+            this.combo += 10; // Bonus combo por jefe
+            this.maxCombo = Math.max(this.maxCombo, this.combo);
+            const bossScore = 2000 + this.level * 500;
+            this.score += bossScore * this.scoreMultiplier;
+            
+            MegaAudio.megaExplode();
+            this.spawnParticles(this.boss.x, this.boss.y, '#ffaa00', 40, 'mega');
+            this.achievements.check('boss', 1);
+            
+            // Spawn power-up legendario garantizado
+            const legendaryTypes = ['laser', 'nuke', 'time', 'mega'];
+            this.powerupPool.get(this.boss.x, this.boss.y, legendaryTypes[randInt(0, 3)]);
+          }
+        }
+      }
+      
+      // vs Enemigos normales
+      for(const enemy of this.enemyPool.active) {
+        if(!enemy.active) continue;
+        if(dist2(shot.x, shot.y, enemy.x, enemy.y) < 500) {
+          shot.active = false;
+          enemy.hp -= shot.damage;
+          
+          if(enemy.hp <= 0) {
+            enemy.active = false;
+            this.combo++;
+            this.maxCombo = Math.max(this.maxCombo, this.combo);
+            
+            // Sistema de multiplicadores épico
+            if(this.combo >= 100) this.scoreMultiplier = 10;
+            else if(this.combo >= 50) this.scoreMultiplier = 6;
+            else if(this.combo >= 20) this.scoreMultiplier = 4;
+            else if(this.combo >= 10) this.scoreMultiplier = 3;
+            else if(this.combo >= 5) this.scoreMultiplier = 2;
+            else this.scoreMultiplier = 1;
+            
+            let points = 15 + enemy.type * 10;
+            if(this.level >= CONFIG.MEGA_MODE_LEVEL) points *= 2;
+            
+            this.score += points * this.scoreMultiplier;
+            this.achievements.check('kill', 1);
+            this.achievements.check('combo', this.combo);
+            this.achievements.check('score', this.score);
+            
+            MegaAudio.hit();
+            this.spawnParticles(enemy.x, enemy.y, '#33ff88', 12);
+            
+            // Efectos especiales para combos épicos
+            if(this.combo >= 10) {
+              MegaAudio.combo(Math.min(this.combo / 10, 5));
+              this.spawnParticles(enemy.x, enemy.y, '#ffaa00', 20, 'mega');
+            }
+            
+            // Power-up spawn con mejor probabilidad en nivel épico
+            const spawnChance = this.level >= CONFIG.MEGA_MODE_LEVEL ? 0.15 : 0.08;
+            if(Math.random() < spawnChance) {
+              let powerupType;
+              
+              if(this.level >= CONFIG.MEGA_MODE_LEVEL) {
+                // Poder legendarios disponibles
+                powerupType = CONFIG.LEGENDARY_POWERUPS[randInt(0, CONFIG.LEGENDARY_POWERUPS.length - 1)];
+              } else {
+                // Solo power-ups básicos
+                powerupType = ['speed', 'triple', 'shield'][randInt(0, 2)];
+              }
+              
+              this.powerupPool.get(enemy.x, enemy.y, powerupType);
+            }
+          } else {
+            // Enemigo dañado pero vivo
+            MegaAudio.hit();
+            this.spawnParticles(shot.x, shot.y, '#ff8800', 5);
+          }
+          break;
+        }
+      }
+    }
+    
+    // Disparos enemigos vs jugador
+    for(const shot of this.shotPool.active) {
+      if(!shot.active || shot.owner !== 'enemy') continue;
+      if(dist2(shot.x, shot.y, this.player.x, this.player.y) < 400) {
+        shot.active = false;
+        this.hitPlayer();
+        break;
+      }
+    }
+    
+    // Jugador vs power-ups
+    for(const powerup of this.powerupPool.active) {
+      if(!powerup.active) continue;
+      if(dist2(powerup.x, powerup.y, this.player.x, this.player.y) < 800) {
+        powerup.active = false;
+        MegaAudio.megaPowerup();
+        this.spawnParticles(powerup.x, powerup.y, '#ffffff', 15, 'mega');
+        
+        // Efectos de power-up
+        switch(powerup.type) {
+          case 'speed':
+            this.powerups.speed = 15;
+            break;
+          case 'triple':
+            this.powerups.triple = 12;
+            break;
+          case 'laser':
+            this.powerups.laser = 10;
+            break;
+          case 'shield':
+            this.player.shield = 8;
+            this.lives = Math.min(this.lives + 1, 5);
+            break;
+          case 'nuke':
+            this.powerups.nuke = 1;
+            this.activateNuke();
+            break;
+          case 'time':
+            this.powerups.time = 8;
+            break;
+          case 'mega':
+            this.powerups.mega = 6;
+            break;
+        }
+        
+        this.updateUI();
+        break;
+      }
+    }
+    
+    // Efecto de tiempo lento
+    if(this.powerups.time > 0) {
+      dt *= 0.3; // Todo va más lento excepto el jugador
+    }
+    
+    // Condiciones de victoria
+    if(this.isBossLevel) {
+      if(!this.boss.active) this.nextLevel();
+    } else {
+      if(this.enemyPool.active.length === 0) this.nextLevel();
+    }
+    
+    // Condición de derrota
+    const enemiesReachedBottom = this.enemyPool.active.some(e => e.active && e.y > this.h - 120);
+    const bossReachedBottom = this.isBossLevel && this.boss.active && this.boss.y > this.h - 150;
+    
+    if(enemiesReachedBottom || bossReachedBottom) {
+      this.state = 'gameover';
+      this.showMessage('👾 ¡INVADIDO! - R PARA REINICIAR');
+    }
+    
+    this.updateUI();
+  },
+  
+  activateNuke() {
+    MegaAudio.nuke();
+    
+    // Destruir todos los enemigos en pantalla
+    let destroyed = 0;
+    
+    for(const enemy of this.enemyPool.active) {
+      if(enemy.active) {
+        enemy.active = false;
+        destroyed++;
+        this.spawnParticles(enemy.x, enemy.y, '#ff0088', 15, 'mega');
+      }
+    }
+    
+    // Dañar jefe significativamente
+    if(this.isBossLevel && this.boss.active) {
+      this.boss.hp -= 20;
+      this.spawnParticles(this.boss.x, this.boss.y, '#ff0088', 30, 'mega');
+      if(this.boss.hp <= 0) {
+        this.boss.active = false;
+        this.combo += 10;
+        this.score += 2000 * this.scoreMultiplier;
+      }
+    }
+    
+    // Bonus por nuke
+    this.combo += destroyed;
+    this.score += destroyed * 50 * this.scoreMultiplier;
+    
+    // Efectos visuales épicos
+    this.spawnParticles(this.w/2, this.h/2, '#ffffff', 50, 'mega');
+    document.body.classList.add('screen-shake');
+    setTimeout(() => document.body.classList.remove('screen-shake'), 800);
+  },
+  
+  render() {
+    const ctx = this.ctx;
+    
+    // Fondo con gradiente dinámico
+    const time = performance.now() * 0.001;
+    const gradient = ctx.createLinearGradient(0, 0, 0, this.h);
+    
+    if(this.level >= CONFIG.MEGA_MODE_LEVEL) {
+      // Fondo épico con colores dinámicos
+      gradient.addColorStop(0, `hsl(${240 + Math.sin(time) * 30}, 70%, 10%)`);
+      gradient.addColorStop(0.3, `hsl(${200 + Math.cos(time * 0.7) * 40}, 60%, 8%)`);
+      gradient.addColorStop(0.7, `hsl(${280 + Math.sin(time * 0.5) * 50}, 50%, 5%)`);
+      gradient.addColorStop(1, '#000000');
+    } else {
+      gradient.addColorStop(0, '#000011');
+      gradient.addColorStop(0.3, '#001133');
+      gradient.addColorStop(0.7, '#000022');
+      gradient.addColorStop(1, '#000000');
+    }
+    
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, this.w, this.h);
+    
+    // Campo de estrellas dinámico
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+    for(let i = 0; i < (this.level >= CONFIG.MEGA_MODE_LEVEL ? 120 : 80); i++) {
+      const x = (i * 127 + time * 10) % this.w;
+      const y = (i * 199 + time * 20) % this.h;
+      const brightness = 0.3 + Math.sin(time + i) * 0.7;
+      
+      ctx.globalAlpha = brightness;
+      ctx.fillRect(x, y, this.level >= CONFIG.MEGA_MODE_LEVEL ? 2 : 1, 
+                          this.level >= CONFIG.MEGA_MODE_LEVEL ? 2 : 1);
+    }
+    ctx.globalAlpha = 1;
+    
+    // Efectos de fondo para power-ups activos
+    if(this.powerups.time > 0) {
+      ctx.fillStyle = 'rgba(0, 255, 255, 0.1)';
+      ctx.fillRect(0, 0, this.w, this.h);
+    }
+    if(this.powerups.mega > 0) {
+      const megaGlow = Math.sin(time * 8) * 0.1 + 0.1;
+      ctx.fillStyle = `rgba(255, 170, 0, ${megaGlow})`;
+      ctx.fillRect(0, 0, this.w, this.h);
+    }
+    
+    // Renderizar entidades
+    this.player.draw(ctx);
+    
+    if(this.isBossLevel && this.boss.active) {
+      this.boss.draw(ctx);
+    }
+    
+    this.enemyPool.draw(ctx);
+    this.shotPool.draw(ctx);
+    this.powerupPool.draw(ctx);
+    this.particlePool.draw(ctx);
+    this.achievements.draw(ctx);
+    
+    // Efectos visuales en el jugador según power-ups
+    if(this.powerups.speed > 0) {
+      ctx.strokeStyle = '#00ffff';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(this.player.x - 14, this.player.y - 10, 28, 20);
+    }
+    if(this.powerups.triple > 0) {
+      ctx.strokeStyle = '#ffaa00';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(this.player.x - 16, this.player.y - 12, 32, 24);
+    }
+    if(this.powerups.laser > 0) {
+      ctx.strokeStyle = '#ff0088';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(this.player.x - 18, this.player.y - 14, 36, 28);
+    }
+    if(this.powerups.mega > 0) {
+      const megaPulse = 1 + Math.sin(time * 6) * 0.3;
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 4;
+      ctx.strokeRect(this.player.x - 20 * megaPulse, this.player.y - 16 * megaPulse, 
+                     40 * megaPulse, 32 * megaPulse);
+    }
+  },
+  
+  updateUI() {
+    $('score').textContent = this.score.toLocaleString();
+    $('lives').textContent = this.lives;
+    $('level').textContent = this.level;
+    $('multiplier').textContent = `x${this.scoreMultiplier}`;
+    
+    // Display de combo épico
+    const combo = $('combo');
+    if(this.combo >= 5) {
+      let comboText = `🔥 COMBO x${this.combo} `;
+      if(this.combo >= 100) comboText += '👑 GODLIKE! 👑';
+      else if(this.combo >= 50) comboText += '⭐ LEGENDARY! ⭐';
+      else if(this.combo >= 20) comboText += '💎 EPIC! 💎';
+      else if(this.combo >= 10) comboText += '⚡ MASTER! ⚡';
+      
+      combo.innerHTML = comboText;
+      combo.style.color = this.combo >= 50 ? '#ff0088' : 
+                         this.combo >= 20 ? '#ffaa00' : 
+                         this.combo >= 10 ? '#00ffff' : '#ffffff';
+    } else {
+      combo.innerHTML = '';
+    }
+    
+    // Display de power-ups
+    const powerups = [];
+    if(this.powerups.speed > 0) powerups.push(`⚡ SPEED ${Math.ceil(this.powerups.speed)}s`);
+    if(this.powerups.triple > 0) powerups.push(`🔫 TRIPLE ${Math.ceil(this.powerups.triple)}s`);
+    if(this.powerups.laser > 0) powerups.push(`💫 LASER ${Math.ceil(this.powerups.laser)}s`);
+    if(this.powerups.mega > 0) powerups.push(`⭐ MEGA ${Math.ceil(this.powerups.mega)}s`);
+    if(this.powerups.time > 0) powerups.push(`⏱️ TIME ${Math.ceil(this.powerups.time)}s`);
+    if(this.player.shield > 0) powerups.push(`🛡️ SHIELD ${Math.ceil(this.player.shield)}s`);
+    
+    $('powerups').innerHTML = powerups.join('<br>');
+    
+    // Display de logros recientes
+    const recentAchievements = Array.from(this.achievements.unlocked).slice(-3);
+    const achievementsText = recentAchievements.map(name => {
+      const achievement = CONFIG.ACHIEVEMENTS[name];
+      return achievement ? `${achievement.icon} ${name}` : '';
+    }).join('<br>');
+    
+    $('achievements').innerHTML = achievementsText ? `LOGROS:<br>${achievementsText}` : '';
+  },
+  
+  showMessage(text) {
+    const msg = $('message');
+    msg.innerHTML = text;
+    if(text) {
+      msg.classList.add('mega-pulse');
+      setTimeout(() => msg.classList.remove('mega-pulse'), 600);
+    }
+  },
+  
+  loop() {
+    const now = performance.now();
+    if(!this.lastTime) this.lastTime = now;
+    
+    let dt = Math.min((now - this.lastTime) / 1000, 1/30);
+    this.lastTime = now;
+    
+    // Efecto de tiempo lento
+    if(this.powerups && this.powerups.time > 0 && this.state === 'playing') {
+      dt *= 0.5;
+    }
+    
+    this.update(dt);
+    this.render();
+    
+    requestAnimationFrame(() => this.loop());
+  }
+};
+
+// ¡INICIALIZAR EL JUEGO MEGA ÉPICO!
+Game.init();
+</script>
+</body>
+</html>

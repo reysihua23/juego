@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mi Juego - Selección de Versión</title>
+  <style>
+    /* Fondo animado estilo gaming */
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e, #1a1a1a);
+      background-size: 400% 400%;
+      animation: gradientBG 10s ease infinite;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #fff;
+      text-align: center;
+    }
+
+    @keyframes gradientBG {
+      0% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    .container {
+      background: rgba(0, 0, 0, 0.6);
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0px 0px 30px rgba(255, 255, 255, 0.2);
+      max-width: 600px;
+      width: 90%;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      color: #00f5ff;
+      text-shadow: 0 0 10px #00f5ff, 0 0 20px #00f5ff;
+    }
+
+    p {
+      font-size: 1.2rem;
+      margin-bottom: 30px;
+      color: #ddd;
+    }
+
+    .buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .btn {
+      padding: 15px 25px;
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: #fff;
+      background: linear-gradient(90deg, #ff0080, #7928ca);
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s ease-in-out;
+      text-decoration: none;
+      text-align: center;
+      box-shadow: 0 0 15px rgba(255, 0, 128, 0.5);
+    }
+
+    .btn:hover {
+      transform: scale(1.1);
+      background: linear-gradient(90deg, #7928ca, #ff0080);
+      box-shadow: 0 0 25px rgba(255, 0, 128, 0.8);
+    }
+
+    /* para salir del sistema*/
+    .contenedor-salir {
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      /* esquina superior derecha */
+      z-index: 1000;
+    }
+
+    #cerrar {
+      background: linear-gradient(135deg, #ff4e50, #8e44ad);
+      border: none;
+      color: white;
+      padding: 10px 18px;
+      font-size: 15px;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    #cerrar:hover {
+      background: linear-gradient(135deg, #8e44ad, #ff4e50);
+      transform: scale(1.08);
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.4);
+    }
+
+    #cerrar:active {
+      transform: scale(0.95);
+    }
+
+    .contenerdor-sugerir {
+      position: fixed;
+      bottom: 15px;
+      /* margen desde abajo */
+      left: 15px;
+      /* margen desde la izquierda */
+      z-index: 1000;
+      /* siempre encima del juego */
+    }
+
+    #sugerir {
+      padding: 8px 15px;
+      background: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .formulario {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      width: 300px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .formulario textarea {
+      width: 100%;
+      height: 80px;
+      margin-bottom: 10px;
+      padding: 5px;
+    }
+
+    .btn-enviar {
+      background: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 8px 15px;
+    }
+
+    .btn-cerrar {
+      background: #f44336;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      float: right;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Botón para sugerencias -->
+  <div class="contenerdor-sugerir" id="sugerencias">
+    <button id="sugerir">Sugerir</button>
+  </div>
+
+  <!-- Formulario oculto (lo puedes poner al final del body de tu index) -->
+  <div class="overlay" id="overlay" style="display: none;">
+    <div class="formulario">
+      <button class="btn-cerrar" id="cerrar">X</button>
+      <h2>Tu sugerencia</h2>
+      <textarea placeholder="Escribe aquí tu idea..."></textarea>
+      <button class="btn-enviar">Enviar</button>
+    </div>
+  </div>
+  <!--para salir de la pestaña-->
+
+  <audio id="musica" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" autoplay loop></audio>
+  <div class="contenedor-salir">
+    <a href="../index.html" class="btn">🎮 Salir</a>
+  </div>
+  <div class="container">
+    <h1>⚡ Bienvenido a Mi Juego ⚡</h1>
+    <p>Elige una versión para jugar:</p>
+    <div class="buttons">
+      <a href="./version1/index.html" class="btn">Comenzar</a>
+      <!--<a href="./version1/index.html" class="btn">🎮 Versión 1</a>
+      <a href="./version2/index.html" class="btn">🔥 Versión 2</a>
+      <a href="./version3/index.html" class="btn">🚀 Versión 3</a>
+      <a href="./version4/index.html" class="btn">🚀 Versión 4</a>
+      <a href="./version5/index.html" class="btn">🚀 Versión 5</a>-->
+    </div>
+  </div>
+
+  <script>
+    const botonSugerir = document.getElementById("sugerir");
+    const overlay = document.getElementById("overlay");
+    const cerrar = document.getElementById("cerrar");
+
+    botonSugerir.addEventListener("click", () => {
+      overlay.style.display = "flex";
+    });
+
+    cerrar.addEventListener("click", () => {
+      overlay.style.display = "none";
+    });
+  </script>
+</body>
+
+</html>

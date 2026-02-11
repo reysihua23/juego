@@ -1,0 +1,513 @@
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚔️ LEYENDA SUPREMA - El Despertar ⚔️</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tsparticles@2/tsparticles.bundle.min.js"></script>
+
+    <style>
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Orbitron', sans-serif;
+            background: radial-gradient(circle at center, #1a1a2e 0%, #0c0c1e 50%, #000000 100%);
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Major+Mono+Display&display=swap');
+
+        #tsparticles {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .title-glitch {
+            font-family: 'Major Mono Display', monospace;
+            font-size: clamp(2rem, 8vw, 6rem);
+            position: relative;
+            animation: glitch-flicker 2s infinite alternate;
+            text-shadow: 
+                0 0 10px #fde047, 
+                0 0 20px #d97706,
+                0 0 40px #f59e0b,
+                2px 2px 0px #ff0080,
+                -2px -2px 0px #00ffff;
+            background: linear-gradient(45deg, #fde047, #d97706, #f59e0b);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .title-glitch::before {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            color: #ff0080;
+            z-index: -1;
+            animation: glitch-1 0.3s infinite;
+        }
+
+        .title-glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            color: #00ffff;
+            z-index: -2;
+            animation: glitch-2 0.3s infinite;
+        }
+
+        @keyframes glitch-flicker {
+            0%, 100% {
+                text-shadow: 
+                    0 0 10px #fde047, 
+                    0 0 20px #d97706,
+                    0 0 40px #f59e0b;
+            }
+            25% {
+                text-shadow: 
+                    0 0 5px #ff00de, 
+                    0 0 10px #ff00de,
+                    0 0 20px #ff00de;
+            }
+            75% {
+                text-shadow: 
+                    0 0 5px #00ffff, 
+                    0 0 10px #00ffff,
+                    0 0 20px #00ffff;
+            }
+        }
+
+        @keyframes glitch-1 {
+            0% { clip: rect(20px, 9999px, 30px, 0); }
+            5% { clip: rect(10px, 9999px, 20px, 0); }
+            10% { clip: rect(40px, 9999px, 50px, 0); }
+            15% { clip: rect(30px, 9999px, 40px, 0); }
+            20% { clip: rect(10px, 9999px, 30px, 0); }
+            100% { clip: rect(0, 9999px, 0, 0); }
+        }
+
+        @keyframes glitch-2 {
+            0% { clip: rect(65px, 9999px, 75px, 0); }
+            5% { clip: rect(80px, 9999px, 90px, 0); }
+            10% { clip: rect(40px, 9999px, 60px, 0); }
+            15% { clip: rect(30px, 9999px, 50px, 0); }
+            20% { clip: rect(70px, 9999px, 80px, 0); }
+            100% { clip: rect(0, 9999px, 0, 0); }
+        }
+
+        .typewriter>p {
+            display: inline-block;
+            overflow: hidden;
+            border-right: .15em solid #fde047;
+            white-space: nowrap;
+            letter-spacing: .1em;
+            animation: typing 2s steps(40, end), blink-caret .75s step-end infinite;
+            text-shadow: 0 0 5px #fff, 0 0 10px #fff;
+        }
+
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+
+        @keyframes blink-caret {
+            50% { border-color: transparent; }
+        }
+
+        .pro-button {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease-in-out;
+            box-shadow: 
+                0 0 20px #fde047,
+                inset 0 0 20px rgba(253, 224, 71, 0.1);
+            animation: button-pulse 2s infinite;
+            background: linear-gradient(45deg, #4338ca, #6366f1, #8b5cf6);
+            border: 2px solid #fde047;
+        }
+
+        .pro-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: left 0.5s;
+        }
+
+        .pro-button:hover {
+            transform: scale(1.05) translateY(-2px);
+            box-shadow: 
+                0 10px 30px rgba(253, 224, 71, 0.6),
+                0 0 50px #fde047;
+        }
+
+        .pro-button:hover::before {
+            left: 100%;
+        }
+
+        @keyframes button-pulse {
+            0%, 100% {
+                box-shadow: 
+                    0 0 15px #fde047,
+                    0 0 25px #d97706,
+                    inset 0 0 20px rgba(253, 224, 71, 0.1);
+            }
+            50% {
+                box-shadow: 
+                    0 0 30px #fde047,
+                    0 0 50px #d97706,
+                    inset 0 0 30px rgba(253, 224, 71, 0.2);
+            }
+        }
+
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            transition: all 0.8s cubic-bezier(0.4, 0.0, 0.2, 1);
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(50px) scale(0.9);
+        }
+
+        .screen.active {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0) scale(1);
+        }
+
+        #loading-screen {
+            background: radial-gradient(circle at center, #1a1a2e 0%, #0c0c1e 50%, #000000 100%);
+            z-index: 1000;
+        }
+
+        .loading-bar-container {
+            width: 80%;
+            max-width: 500px;
+            height: 25px;
+            background-color: rgba(45, 55, 72, 0.8);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 
+                0 0 20px rgba(255, 255, 255, 0.4),
+                inset 0 0 10px rgba(0, 0, 0, 0.5);
+            border: 2px solid #fde047;
+        }
+
+        .loading-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #fde047, #d97706, #f59e0b, #fbbf24);
+            background-size: 200% 100%;
+            animation: loading-pulse 2s infinite, loading-flow 3s infinite;
+            border-radius: 13px;
+            box-shadow: 0 0 15px rgba(253, 224, 71, 0.8);
+        }
+
+        @keyframes loading-pulse {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.5); }
+        }
+
+        @keyframes loading-flow {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .click-indicator {
+            animation: bounce-glow 2s infinite;
+            cursor: pointer;
+        }
+
+        @keyframes bounce-glow {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+                text-shadow: 0 0 10px #fff;
+            }
+            40% {
+                transform: translateY(-10px);
+                text-shadow: 0 0 20px #fde047;
+            }
+            60% {
+                transform: translateY(-5px);
+                text-shadow: 0 0 15px #d97706;
+            }
+        }
+
+        .final-button {
+            background: linear-gradient(45deg, #10b981, #059669, #047857);
+            box-shadow: 
+                0 0 30px #10b981,
+                0 10px 20px rgba(16, 185, 129, 0.3);
+            animation: final-pulse 1.5s infinite;
+            border: 3px solid #6ee7b7;
+        }
+
+        .final-button:hover {
+            transform: scale(1.1) translateY(-5px);
+            box-shadow: 
+                0 0 50px #10b981,
+                0 15px 30px rgba(16, 185, 129, 0.5);
+        }
+
+        @keyframes final-pulse {
+            0%, 100% {
+                box-shadow: 
+                    0 0 30px #10b981,
+                    0 10px 20px rgba(16, 185, 129, 0.3);
+            }
+            50% {
+                box-shadow: 
+                    0 0 50px #10b981,
+                    0 15px 30px rgba(16, 185, 129, 0.5);
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-gray-900 flex items-center justify-center h-screen text-white">
+
+    <div id="tsparticles"></div>
+
+    <audio id="musica" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" autoplay loop></audio>
+
+    <button id="audio-control-btn"
+        class="absolute top-4 right-4 px-4 py-2 bg-gray-800 text-yellow-500 rounded-full shadow-lg z-50">
+        🔇
+    </button>
+
+    <!-- Pantalla inicial -->
+    <div id="initial-screen" class="screen active">
+        <h1 class="title-glitch mb-8" data-text="LEYENDA SUPREMA">LEYENDA SUPREMA</h1>
+        <p class="text-xl text-white click-indicator mb-4">
+            ⚡ HAZ CLIC PARA ENTRAR A LA AVENTURA ⚡
+        </p>
+        <div class="text-sm text-gray-400 animate-pulse">
+            🎮 Prepárate para la experiencia más épica 🎮
+        </div>
+    </div>
+
+    <!-- Pantalla de carga -->
+    <div id="loading-screen" class="screen">
+        <h2 class="text-3xl font-bold mb-6 animate-pulse title-glitch" data-text="CARGANDO MUNDO">CARGANDO MUNDO</h2>
+        <div class="loading-bar-container mb-4">
+            <div id="loading-bar" class="loading-bar"></div>
+        </div>
+        <p id="loading-text" class="mt-4 text-lg text-gray-300">Preparando datos cósmicos...</p>
+        <div class="mt-2 text-sm text-yellow-400" id="loading-percentage">0%</div>
+    </div>
+
+    <!-- Pantalla 1 -->
+    <div id="pantalla1" class="screen">
+        <h1 class="title-glitch mb-8" data-text="⚔️ Bienvenido Guerrero ⚔️">⚔️ Bienvenido Guerrero ⚔️</h1>
+        <div class="typewriter text-2xl mb-8">
+            <p>Prepárate para la batalla más épica de tu vida...</p>
+        </div>
+        <div class="text-lg text-gray-300 mb-6">
+            💀 Enemigos te esperan en cada esquina 💀
+        </div>
+        <button onclick="cargarPantalla(2)" class="pro-button px-10 py-5 rounded-2xl text-2xl font-bold">
+            ⚔️ Continuar → ⚔️
+        </button>
+    </div>
+
+    <!-- Pantalla 2 -->
+    <div id="pantalla2" class="screen">
+        <h1 class="title-glitch mb-8" data-text="🌌 Explora las Salas">🌌 Explora las Salas</h1>
+        <div class="typewriter text-2xl mb-8">
+            <p>Cada sala guarda secretos, enemigos y tesoros...</p>
+        </div>
+        <div class="text-lg text-gray-300 mb-6">
+            🏆 Descubre armas legendarias y poderes ocultos 🏆
+        </div>
+        <button onclick="cargarPantalla(3)" class="pro-button px-10 py-5 rounded-2xl text-2xl font-bold">
+            🗝️ Ver Salas → 🗝️
+        </button>
+    </div>
+
+    <!-- Pantalla 3 -->
+    <div id="pantalla3" class="screen">
+        <h1 class="title-glitch mb-8" data-text="🔥 El Juego Comienza 🔥">🔥 El Juego Comienza 🔥</h1>
+        <div class="typewriter text-2xl mb-8">
+            <p>¿Tienes lo necesario para sobrevivir?</p>
+        </div>
+        <div class="text-lg text-gray-300 mb-8">
+            ⚡ La leyenda te está esperando ⚡<br>
+            🌟 ¿Serás digno del título de SUPREMO? 🌟
+        </div>
+
+        <button onclick="iniciarJuego()" class="final-button px-12 py-6 text-black font-bold rounded-xl text-2xl transition-all duration-300">
+            🚀 ¡ENTRAR AL JUEGO! 🚀
+        </button>
+    </div>
+
+    <script>
+        // Configuración mejorada de tsParticles
+        tsParticles.load("tsparticles", {
+            particles: {
+                number: { value: 120 },
+                color: { value: ["#fde047", "#d97706", "#ffffff", "#ff0080", "#00ffff"] },
+                shape: { 
+                    type: ["circle", "triangle", "polygon"],
+                    polygon: { sides: 6 }
+                },
+                opacity: { 
+                    value: { min: 0.3, max: 0.8 },
+                    animation: { enable: true, speed: 0.5 }
+                },
+                size: { 
+                    value: { min: 1, max: 6 },
+                    animation: { enable: true, speed: 2 }
+                },
+                move: { 
+                    enable: true, 
+                    speed: { min: 1, max: 3 }, 
+                    direction: "top-right",
+                    out_mode: "out",
+                    attract: { enable: true, rotateX: 600, rotateY: 1200 }
+                },
+                links: {
+                    enable: true,
+                    distance: 150,
+                    color: "#fde047",
+                    opacity: 0.2,
+                    width: 1
+                }
+            },
+            interactivity: {
+                detectsOn: "canvas",
+                events: {
+                    onHover: { enable: true, mode: "repulse" },
+                    onClick: { enable: true, mode: "push" }
+                }
+            }
+        });
+
+        const audio = document.getElementById("musica");
+        const audioBtn = document.getElementById("audio-control-btn");
+        let audioEnabled = false;
+
+        audioBtn.addEventListener("click", () => {
+            if (audioEnabled) {
+                audio.pause();
+                audioBtn.textContent = "🔇";
+                audioEnabled = false;
+            } else {
+                audio.play().catch(e => console.log("Audio blocked"));
+                audioBtn.textContent = "🔊";
+                audioEnabled = true;
+            }
+        });
+
+        // Mejorar el clic inicial
+        document.getElementById('initial-screen').addEventListener('click', () => {
+            // Reproducir audio si es posible
+            audio.play().then(() => {
+                audioBtn.textContent = '🔊';
+                audioEnabled = true;
+            }).catch(e => {
+                console.log("Audio bloqueado por el navegador");
+            });
+
+            // Iniciar la primera transición
+            document.getElementById('initial-screen').classList.remove('active');
+            setTimeout(() => {
+                document.getElementById('pantalla1').classList.add('active');
+            }, 400);
+        });
+
+        function cargarPantalla(num) {
+            // Remover pantalla activa
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            
+            // Mostrar pantalla de carga
+            document.getElementById('loading-screen').classList.add('active');
+
+            const loadingBar = document.getElementById('loading-bar');
+            const loadingText = document.getElementById('loading-text');
+            const loadingPercentage = document.getElementById('loading-percentage');
+            
+            const loadingMessages = [
+                "Cargando armas legendarias...",
+                "Preparando enemigos épicos...",
+                "Configurando salas místicas...",
+                "Activando poderes supremos...",
+                "¡Casi listo para la batalla!"
+            ];
+
+            let width = 0;
+            let messageIndex = 0;
+            
+            const interval = setInterval(() => {
+                width += 2;
+                loadingBar.style.width = width + '%';
+                loadingPercentage.textContent = width + '%';
+                
+                // Cambiar mensaje cada 20%
+                const newMessageIndex = Math.floor(width / 20);
+                if (newMessageIndex !== messageIndex && newMessageIndex < loadingMessages.length) {
+                    messageIndex = newMessageIndex;
+                    loadingText.textContent = loadingMessages[messageIndex];
+                }
+                
+                if (width >= 100) {
+                    clearInterval(interval);
+                    loadingText.textContent = "¡Carga completa! Preparando experiencia...";
+                    
+                    setTimeout(() => {
+                        document.getElementById('loading-screen').classList.remove('active');
+                        setTimeout(() => {
+                            document.getElementById('pantalla' + num).classList.add('active');
+                        }, 200);
+                    }, 800);
+                }
+            }, 40); // Carga más rápida
+        }
+
+        function iniciarJuego() {
+            // Efecto de transición épica antes de ir al juego
+            document.body.style.transform = 'scale(1.1)';
+            document.body.style.filter = 'brightness(1.5)';
+            
+            setTimeout(() => {
+                // Aquí puedes cambiar la URL por la ruta correcta de tu juego
+                window.location.href = './front-end/index.html';
+            }, 500);
+        }
+
+        // Efecto de partículas adicional en hover de botones
+        document.querySelectorAll('.pro-button, .final-button').forEach(btn => {
+            btn.addEventListener('mouseenter', () => {
+                // Crear efecto de partículas en el botón
+                tsParticles.domItem(0).particles.push(50);
+            });
+        });
+    </script>
+</body>
+
+</html>
